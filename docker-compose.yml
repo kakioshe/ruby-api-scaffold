@@ -1,0 +1,35 @@
+version: "3.9"
+services:
+  db:
+    image: mysql:8.0.23
+    container_name: jobfair-mysql
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: DJ28JHNXKU
+      MYSQL_DATABASE: jobfair_db
+      MYSQL_USER: root
+      MYSQL_PASSWORD: DJ28JHNXKU
+    restart: unless-stopped
+    volumes:
+      - ./docker/mysql/data:/var/lib/mysql
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: foreman start -f Procfile.dev -p 3000
+    container_name: jobfair-rails
+    environment:
+      DB_USERNAME: root
+      DB_PASSWORD: DJ28JHNXKU
+      DB_NAME: jobfair_db
+    volumes:
+      - .:/app
+      - type: tmpfs
+        target: /app/tmp/pids/
+    ports:
+      - "3000:3000"
+      - "35729:35729"
+    depends_on:
+      - db
